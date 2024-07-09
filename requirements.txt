@@ -21,3 +21,4 @@ openpyxl
 pymupdf
 requests
 boto3
+pdfplumber
