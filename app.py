@@ -20,7 +20,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 from nltk.corpus import stopwords
-from dotenv import load_dotenv
 import tabula
 from unidecode import unidecode  # Importar unidecode para normalizar acentos y caracteres especiales
 
@@ -29,10 +28,6 @@ from unidecode import unidecode  # Importar unidecode para normalizar acentos y 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
-
-# Carga las variables de entorno desde el archivo .env
-load_dotenv()
-
 
 
 # Función para preprocesar texto, incluyendo normalización de acentos y manejo de saltos de línea
@@ -280,8 +275,8 @@ def generate_response(relevant_chunks, emotional_tone, style):
     emotional_tone = emotional_tone.replace("_", " ")  # Reemplaza underscores con espacios para que Bedrock lo entienda
     prompt = f"Pregunta: {user_query}\n\nInformación relevante:\n{response_lines}\n\nTono emocional: {emotional_tone}\nEstilo: {style}"
     
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    aws_access_key_id=aws_access_key_id,
+    aws_secret_access_key=aws_secret_access_key,
 
     response = vector_store_model.invoke_bedrock(
         prompt=prompt,
@@ -363,8 +358,8 @@ if uploaded_files:
                 [chunk.page_content if hasattr(chunk, 'page_content') else chunk for chunk in relevant_chunks]
             ) + "\n\nRespuesta:"
 
-            aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-            aws_secret_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            aws_access_key_id=aws_access_key_id,
+            aws_secret_access_key=aws_secret_access_key,
 
             response = vector_store_model.invoke_bedrock(prompt, aws_access_key_id, aws_secret_access_key)
             st.subheader("Respuesta generada:")
