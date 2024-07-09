@@ -21,10 +21,16 @@ import numpy as np
 import faiss
 from nltk.corpus import stopwords
 
+# Definir las credenciales de AWS
+AWS_ACCESS_KEY_ID = "tu_access_key_id"
+AWS_SECRET_ACCESS_KEY = "tu_secret_access_key"
+AWS_REGION = "tu_region"
+
 # Mostrar las credenciales en Streamlit
 st.write("AWS Access Key ID:", AWS_ACCESS_KEY_ID)
 st.write("AWS Secret Access Key:", AWS_SECRET_ACCESS_KEY)
 st.write("AWS Region Name:", AWS_REGION)
+
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
