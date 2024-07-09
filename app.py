@@ -182,7 +182,7 @@ class VectorStoreModel:
             vector_store.add(vector)
         return vector_store
 
-    def get_relevant_chunks(self, vector_store, query, text_chunks, top_k=2):
+    def get_relevant_chunks(self, vector_store, query, text_chunks, top_k=10):
         if vector_store is None:
             st.error("El almacén de vectores no está disponible.")
             return []
@@ -198,11 +198,12 @@ class VectorStoreModel:
 
         return relevant_chunks
 
-    def invoke_bedrock(self, prompt, aws_access_key_id, aws_secret_access_key, temperature=0.5, top_p=0.95):
+    def invoke_bedrock(self, prompt, aws_access_key_id, aws_secret_access_key, "region_name", temperature=0.5, top_p=0.95):
         brt = boto3.client(
             service_name='bedrock-runtime',
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key
+            region_name=region_name
         )
         modelId = 'meta.llama2-70b-chat-v1'
         
