@@ -22,9 +22,9 @@ import faiss
 from nltk.corpus import stopwords
 
 # Acceder a las credenciales y la región desde secrets.toml
-aws_access_key_id = st.secrets["aws"]["aws_access_key_id"]
-aws_secret_access_key = st.secrets["aws"]["aws_secret_access_key"]
-region_name = st.secrets["aws"]["region"]
+aws_access_key_id = "aws_access_key_id"
+aws_secret_access_key = "aws_secret_access_key"
+region = "region"
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
