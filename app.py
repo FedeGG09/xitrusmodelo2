@@ -198,7 +198,7 @@ class VectorStoreModel:
 
         return relevant_chunks
 
-    def invoke_bedrock(self, prompt, aws_access_key_id, aws_secret_access_key, "region_name", temperature=0.5, top_p=0.95):
+    def invoke_bedrock(self, prompt, aws_access_key_id, aws_secret_access_key, temperature=0.5, top_p=0.95):
         brt = boto3.client(
             service_name='bedrock-runtime',
             aws_access_key_id=aws_access_key_id,
