@@ -203,7 +203,7 @@ class VectorStoreModel:
             service_name='bedrock-runtime',
             aws_access_key_id=aws_access_key_id,
             aws_secret_access_key=aws_secret_access_key,
-            region = "region"
+            region_name=region_name
         )
         modelId = 'meta.llama2-70b-chat-v1'
         
