@@ -20,7 +20,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 from nltk.corpus import stopwords
-from unidecode import unidecode  # Importar unidecode para normalizar caracteres
+
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
