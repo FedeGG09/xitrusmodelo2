@@ -356,8 +356,8 @@ if uploaded_files:
                 [chunk.page_content if hasattr(chunk, 'page_content') else chunk for chunk in relevant_chunks]
             ) + "\n\nRespuesta:"
 
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key,
+            AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
+            AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY',
 
             response = vector_store_model.invoke_bedrock(prompt, aws_access_key_id, aws_secret_access_key)
             st.subheader("Respuesta generada:")
