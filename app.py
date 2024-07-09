@@ -22,8 +22,8 @@ import faiss
 from nltk.corpus import stopwords
 
 # Acceder a las credenciales y la región desde secrets.toml
-aws_access_key_id = "aws_access_key_id"
-aws_secret_access_key = "aws_secret_access_key"
+aws_access_key_id = "aws_access_key_id",
+aws_secret_access_key = "aws_secret_access_key",
 region = "region"
 
 # Inicialización de chat_history si no está definido en st.session_state
@@ -202,7 +202,7 @@ class VectorStoreModel:
         brt = boto3.client(
             service_name='bedrock-runtime',
             aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key
+            aws_secret_access_key=aws_secret_access_key,
             region_name=region_name
         )
         modelId = 'meta.llama2-70b-chat-v1'
