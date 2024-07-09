@@ -7,7 +7,7 @@ langchain
 langchain-community
 langchain-core
 langchain-text-splitters
-ctransformers
+transformers
 safetensors
 scikit-learn
 openpyxl
