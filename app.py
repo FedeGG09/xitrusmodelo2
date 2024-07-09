@@ -20,7 +20,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 from nltk.corpus import stopwords
-
+from unidecode import unidecode
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
@@ -72,7 +72,17 @@ def load_access_file(uploaded_file):
         return None
 
 def load_excel_file(uploaded_file):
-    return pd.read_excel(uploaded_file, sheet_name=None)
+    try:
+        xl = pd.ExcelFile(uploaded_file)
+        data = {}
+        for sheet_name in xl.sheet_names:
+            df = xl.parse(sheet_name)
+            df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
+            data[sheet_name] = df
+        return data
+    except Exception as e:
+        st.error(f"Error al cargar archivo Excel {uploaded_file.name}: {str(e)}")
+        return None
 
 def tokenize_and_retrieve_info(user_query, ontology, db_data):
     if not user_query:
@@ -150,6 +160,7 @@ def extract_tables_from_pdfs(pdf_files):
                     extracted_tables = page.extract_tables()
                     for table in extracted_tables:
                         df = pd.DataFrame(table[1:], columns=table[0])
+                        df.columns = pd.io.parsers.ParserBase({'names': df.columns})._maybe_dedup_names(df.columns)
                         tables.append(df)
         except Exception as e:
             st.error(f"Error al extraer tablas del archivo {pdf_file.name}: {e}")
@@ -187,137 +198,52 @@ class VectorStoreModel:
         query_vector = np.array(query_vector)
         query_vector = query_vector.reshape(1, -1)
         distances, indices = vector_store.search(query_vector, k=top_k)
-        
-        relevant_chunks = []
-        for idx in indices[0]:
-            relevant_chunks.append(text_chunks[idx])
-
+        indices = indices.flatten()
+        relevant_chunks = [text_chunks[i] for i in indices]
         return relevant_chunks
 
-    def invoke_bedrock(self, prompt, aws_access_key_id, aws_secret_access_key, temperature=0.5, top_p=0.95):
-        brt = boto3.client(
-            service_name='bedrock-runtime',
-            aws_access_key_id=aws_access_key_id,
-            aws_secret_access_key=aws_secret_access_key
-        )
-        modelId = 'meta.llama2-70b-chat-v1'
-        
-        body = json.dumps({
-            "prompt": prompt,
-            "temperature": temperature,
-            "top_p": top_p
-        })
-        
-        response = brt.invoke_model(body=body, modelId=modelId, accept='application/json', contentType='application/json')
-        return response['body'].read()
+uploaded_files = st.file_uploader("Cargar archivos", type=["ttl", "pkl", "accdb", "xls", "xlsx", "pdf"], accept_multiple_files=True)
 
-# Parámetros del modelo definidos directamente en el código
-model_name = "nombre_del_modelo"  # Reemplaza con el nombre real del modelo
-model_version = "version_del_modelo"  # Reemplaza con la versión real del modelo
+ontology = None
+db_data = {}
+pdf_files = []
 
-# Instancia de VectorStoreModel
-vector_store_model = VectorStoreModel(model_name, model_version)
-
-# Function to generate the proposed string based on the style
-def generate_style_string(style):
-    if style == "neutral":
-        return "it must reflect objectivity, factual accuracy, and a commitment to avoiding subjective influence, serving as a reliable source of information without introducing biases or personal opinions into the generated content."
-    elif style == "formal":
-        return "it must exhibit a high level of linguistic formality, presenting information in a structured and polished manner, suiting professional contexts and interactions where a formal tone is expected."
-    elif style == "informal":
-        return "it must be tailored to create a casual and conversational tone, allowing the AI's responses to engage users in a friendly and approachable manner, suitable for less formal interactions."
-    elif style == "humorous":
-        return "it must infuse responses with wit and humor, aiming to entertain and amuse users while still providing relevant information or assistance, creating an enjoyable and light-hearted interaction experience."
-    else:
-        return "it must reflect objectivity, factual accuracy, and a commitment to avoiding subjective influence, serving as a reliable source of information without introducing biases or personal opinions into the generated content."
-
-# Streamlit interface
-st.title("Carga y Consulta de Archivos en Ontología y Base de Datos")
-st.write("Sube tus archivos para realizar consultas.")
-
-uploaded_files = st.file_uploader("Subir archivos", accept_multiple_files=True)
-
-# Checkbox para mostrar/ocultar opciones avanzadas
-show_advanced_options = st.checkbox("Mostrar opciones avanzadas")
-
-if show_advanced_options:
-    advanced_expander = st.expander("Opciones avanzadas", expanded=False)
-    with advanced_expander:
-        # Selección de archivos por tipo
-        st.write("Selecciona los archivos para cada tipo:")
-        ontology_files = st.multiselect("Archivos de Ontología", uploaded_files, format_func=lambda x: x.name)
-        pdf_files = st.multiselect("Archivos PDF", uploaded_files, format_func=lambda x: x.name)
-        excel_files = st.multiselect("Archivos Excel", uploaded_files, format_func=lambda x: x.name)
-        access_files = st.multiselect("Archivos Access", uploaded_files, format_func=lambda x: x.name)
-        pickle_files = st.multiselect("Archivos Pickle", uploaded_files, format_func=lambda x: x.name)
-
-        # Mostrar los archivos seleccionados en cada categoría
-        st.write("Archivos seleccionados:")
-        st.write("Ontología:", [file.name for file in ontology_files])
-        st.write("PDF:", [file.name for file in pdf_files])
-        st.write("Excel:", [file.name for file in excel_files])
-        st.write("Access:", [file.name for file in access_files])
-        st.write("Pickle:", [file.name for file in pickle_files])
-
-# Manejo de archivos cargados y procesamiento
 if uploaded_files:
-    # Cargar archivos y procesar
-    ontology_data = [load_ontology_file(file) for file in uploaded_files if file.name.endswith(('.ttl', '.rdf'))]
-    pdf_data = load_documents([file for file in uploaded_files if file.name.endswith('.pdf')])
-    excel_data = {file.name: load_excel_file(file) for file in uploaded_files if file.name.endswith('.xlsx')}
-    access_data = {file.name: load_access_file(file) for file in uploaded_files if file.name.endswith('.accdb')}
-    pickle_data = {file.name: load_pickle_file(file) for file in uploaded_files if file.name.endswith('.pkl')}
-
+    for uploaded_file in uploaded_files:
+        if uploaded_file.name.endswith(".ttl") or uploaded_file.name.endswith(".rdf"):
+            ontology = load_file(uploaded_file, '.ttl', load_ontology_file)
+        elif uploaded_file.name.endswith(".pkl"):
+            db_data = load_file(uploaded_file, '.pkl', load_pickle_file)
+        elif uploaded_file.name.endswith(".accdb"):
+            db_data = load_file(uploaded_file, '.accdb', load_access_file)
+        elif uploaded_file.name.endswith(".xls") or uploaded_file.name.endswith(".xlsx"):
+            db_data = load_excel_file(uploaded_file)
+        elif uploaded_file.name.endswith(".pdf"):
+            pdf_files.append(uploaded_file)
+            
     st.success("Archivos cargados exitosamente.")
 
-    # Proceso de extracción de tablas de archivos PDF
     if pdf_files:
-        extracted_tables = extract_tables_from_pdfs([file for file in uploaded_files if file.name.endswith('.pdf')])
+        extracted_tables = extract_tables_from_pdfs(pdf_files)
         for idx, table in enumerate(extracted_tables):
             st.write(f"Tabla extraída {idx + 1}")
-            st.dataframe(table)
+            st.write(table)
 
-    # Proceso de tokenización y recuperación de información
-    user_query = st.text_input("Ingrese su consulta:")
-
-    if st.button("Buscar información"):
-        ontology_info, db_info = tokenize_and_retrieve_info(user_query, ontology_data, excel_data)
-        if ontology_info:
-            st.write("Información relevante en la ontología:")
-            for info in ontology_info:
-                st.write(info)
-        if db_info:
-            st.write("Información relevante en la base de datos:")
-            for table_name, records in db_info.items():
-                st.write(f"Tabla: {table_name}")
-                st.write(pd.DataFrame(records))
-
-    # Procesamiento de chunks de texto
-    text_chunks = split_text_into_chunks(pdf_data)
-
-    # Almacén de vectores
-    vector_store = vector_store_model.get_vectorstore(text_chunks)
-
-    # Selección de estilo
-    style = st.selectbox("Selecciona el estilo de respuesta", ["neutral", "formal", "informal", "humorous"])
-    proposed_string = generate_style_string(style)
-
-    # Guardar el historial de chat en st.session_state
-    st.session_state.chat_history.append({
-        'user_query': user_query,
-        'ontology_info': ontology_info,
-        'db_info': db_info,
-        'style': style,
-        'proposed_string': proposed_string
-    })
-
-    # Mostrar el historial de chat
-    st.write("Historial de chat:")
-    for idx, chat in enumerate(st.session_state.chat_history, 1):
-        st.write(f"{idx}. Usuario: {chat['user_query']}")
-        st.write(f"  - Ontología: {chat['ontology_info']}")
-        st.write(f"  - Base de datos: {chat['db_info']}")
-        st.write(f"  - Estilo: {chat['style']}")
-        st.write(f"  - Propuesta: {chat['proposed_string']}")
-else:
-    st.info("Por favor, suba al menos un archivo para comenzar.")
+st.write("Archivos cargados:", uploaded_files)
+user_query = st.text_input("Ingrese su consulta")
+if st.button("Buscar"):
+    ontology_info, db_info = tokenize_and_retrieve_info(user_query, ontology, db_data)
+    if ontology_info:
+        st.write("Información encontrada en la ontología:")
+        for subj, pred, obj in ontology_info:
+            st.write(f"Sujeto: {subj}, Predicado: {pred}, Objeto: {obj}")
+    else:
+        st.write("No se encontró información relevante en la ontología.")
+    
+    if db_info:
+        st.write("Información encontrada en la base de datos:")
+        for table_name, rows in db_info.items():
+            st.write(f"Tabla: {table_name}")
+            st.write(rows)
+    else:
+        st.write("No se encontró información relevante en la base de datos.")
