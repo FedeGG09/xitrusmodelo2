@@ -22,4 +22,4 @@ pymupdf
 requests
 boto3
 pdfplumber
-faiss
+faiss-cpu
