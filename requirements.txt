@@ -19,3 +19,4 @@ requests
 boto3
 pdfplumber
 faiss-cpu
+sentence_transformers
