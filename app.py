@@ -278,8 +278,8 @@ def generate_response(relevant_chunks, emotional_tone, style):
 
     response = vector_store_model.invoke_bedrock(
         prompt=prompt,
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secret_access_key,
+        AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
+        AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY',
         temperature=0.5,
         top_p=0.95
     )
