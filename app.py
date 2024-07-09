@@ -21,10 +21,14 @@ import numpy as np
 import faiss
 from nltk.corpus import stopwords
 
-# Acceder a las credenciales y la región desde secrets.toml
-aws_access_key_id = "aws_access_key_id",
-aws_secret_access_key = "aws_secret_access_key",
-region = "region"
+aws_access_key_id = "tu_access_key_id"
+aws_secret_access_key = "tu_secret_access_key"
+region_name = "tu_region"
+
+# Verificar que se cargan correctamente (solo para depuración, no en producción)
+st.write("AWS Access Key ID:", aws_access_key_id)
+st.write("AWS Secret Access Key:", aws_secret_access_key)
+st.write("AWS Region Name:", region_name)
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
