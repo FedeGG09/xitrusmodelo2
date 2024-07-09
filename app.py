@@ -20,7 +20,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 from nltk.corpus import stopwords
-import tabula
 from unidecode import unidecode  # Importar unidecode para normalizar acentos y caracteres especiales
 
 
