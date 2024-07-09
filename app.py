@@ -278,8 +278,8 @@ def generate_response(relevant_chunks, emotional_tone, style):
 
     response = vector_store_model.invoke_bedrock(
         prompt=prompt,
-        AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
-        AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY',
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key,
         temperature=0.5,
         top_p=0.95
     )
@@ -356,8 +356,8 @@ if uploaded_files:
                 [chunk.page_content if hasattr(chunk, 'page_content') else chunk for chunk in relevant_chunks]
             ) + "\n\nRespuesta:"
 
-            AWS_ACCESS_KEY_ID = "AWS_ACCESS_KEY_ID",
-            AWS_SECRET_ACCESS_KEY = 'AWS_SECRET_ACCESS_KEY',
+            aws_access_key_id=aws_access_key_id,,
+            aws_secret_access_key=aws_secret_access_key,
 
             response = vector_store_model.invoke_bedrock(prompt, aws_access_key_id, aws_secret_access_key)
             st.subheader("Respuesta generada:")
