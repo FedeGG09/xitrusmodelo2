@@ -1,4 +1,5 @@
 streamlit-chat==0.1.1
+nltk
 pyodbc==5.1.0
 SQLAlchemy==2.0.30
 rdflib==7.0.0
