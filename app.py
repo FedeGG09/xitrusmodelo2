@@ -21,9 +21,9 @@ import numpy as np
 import faiss
 from nltk.corpus import stopwords
 
-aws_access_key_id = "tu_access_key_id"
-aws_secret_access_key = "tu_secret_access_key"
-region_name = "tu_region"
+AWS_ACCESS_KEY_ID = "tu_access_key_id"
+AWS_SECRET_ACCESS_KEY = "tu_secret_access_key"
+AWS_REGION = "tu_region"
 
 # Verificar que se cargan correctamente (solo para depuración, no en producción)
 st.write("AWS Access Key ID:", aws_access_key_id)
