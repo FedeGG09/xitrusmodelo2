@@ -12,6 +12,7 @@ import faiss
 import json
 import pandas as pd 
 
+openai_api_key =""
 
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
