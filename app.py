@@ -18,8 +18,7 @@ import pandas as pd
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
-# Carga las variables de entorno desde el archivo .env
-load_dotenv()
+openai_api_key = os.getenv('OPENAI_API_KEY')
 
 # Función para cargar documentos PDF
 def load_documents(uploaded_files):
