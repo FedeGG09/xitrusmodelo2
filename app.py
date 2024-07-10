@@ -10,7 +10,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 import json
-import tabula
 import pandas as pd 
 
 # Inicialización de chat_history si no está definido en st.session_state
