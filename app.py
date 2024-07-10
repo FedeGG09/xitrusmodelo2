@@ -17,7 +17,9 @@ if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
 # Obtener la clave de API de OpenAI desde las variables de entorno configuradas en Streamlit Cloud
+
 openai_api_key = st.secrets["OPENAI_API_KEY"]
+
 
 # Función para cargar documentos PDF
 def load_documents(uploaded_files):
