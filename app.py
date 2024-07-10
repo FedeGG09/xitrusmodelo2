@@ -16,7 +16,8 @@ import pandas as pd
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
-openai_api_key = os.getenv('OPENAI_API_KEY')
+# Obtener la clave de API de OpenAI desde las variables de entorno configuradas en Streamlit Cloud
+openai_api_key = st.secrets["OPENAI_API_KEY"]
 
 # Función para cargar documentos PDF
 def load_documents(uploaded_files):
@@ -160,8 +161,6 @@ if uploaded_files:
             prompt = f"Pregunta: {user_query}\n\nInformación relevante:\n" + "\n".join(
                 [chunk.page_content if hasattr(chunk, 'page_content') else chunk for chunk in relevant_chunks]
             ) + "\n\nRespuesta:"
-
-            openai_api_key = os.getenv('OPENAI_API_KEY')
 
             response = vector_store_model.invoke_openai(prompt, openai_api_key)
             st.subheader("Respuesta generada:")
