@@ -12,6 +12,9 @@ import faiss
 import json
 import pandas as pd 
 
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
+
 # Inicialización de chat_history si no está definido en st.session_state
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
