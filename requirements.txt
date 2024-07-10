@@ -16,7 +16,7 @@ pandas
 pickle-mixin
 pymupdf
 requests
-boto3
+openai
 pdfplumber
 faiss-cpu
 sentence_transformers
