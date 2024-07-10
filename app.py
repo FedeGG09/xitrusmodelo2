@@ -10,7 +10,6 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 import numpy as np
 import faiss
 import json
-from dotenv import load_dotenv
 import tabula
 import pandas as pd 
 
