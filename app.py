@@ -111,7 +111,7 @@ class VectorStoreModel:
                 return response.choices[0]['message']['content'].strip()
             else:
                 return "Lo siento, no pude generar una respuesta para tu pregunta."
-        except openai.Error as e:
+        except openai.error.OpenAIError as e:
             return f"Ocurrió un error al procesar la respuesta de OpenAI: {str(e)}"
         except Exception as e:
             return f"Ocurrió un error inesperado: {str(e)}"
